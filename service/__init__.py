@@ -6,6 +6,9 @@ and SQL database
 """
 import sys
 from flask import Flask
+from flask_talisman import Talisman
+from flask_cors import CORS   # ✅ NEW
+
 from service import config
 from service.common import log_handlers
 
@@ -13,14 +16,24 @@ from service.common import log_handlers
 app = Flask(__name__)
 app.config.from_object(config)
 
-# Import the routes After the Flask app is created
-# pylint: disable=wrong-import-position, cyclic-import, wrong-import-order
-from service import routes, models  # noqa: F401 E402
+# 🔐 Security headers
+talisman = Talisman(
+    app,
+    content_security_policy={
+        "default-src": ["'self'"],
+        "object-src": ["'none'"],
+    },
+    force_https=True,
+)
 
-# pylint: disable=wrong-import-position
-from service.common import error_handlers, cli_commands  # noqa: F401 E402
+# 🌐 CORS headers
+CORS(app)   # ✅ THIS IS THE KEY LINE
 
-# Set up logging for production
+# Import routes and models AFTER app creation
+from service import routes, models  # noqa: E402,F401
+from service.common import error_handlers, cli_commands  # noqa: E402,F401
+
+# Logging
 log_handlers.init_logging(app, "gunicorn.error")
 
 app.logger.info(70 * "*")
@@ -28,10 +41,9 @@ app.logger.info("  A C C O U N T   S E R V I C E   R U N N I N G  ".center(70, "
 app.logger.info(70 * "*")
 
 try:
-    models.init_db(app)  # make our database tables
+    models.init_db(app)
 except Exception as error:  # pylint: disable=broad-except
     app.logger.critical("%s: Cannot continue", error)
-    # gunicorn requires exit code 4 to stop spawning workers when they die
     sys.exit(4)
 
 app.logger.info("Service initialized!")
