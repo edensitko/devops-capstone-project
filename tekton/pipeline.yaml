@@ -2,6 +2,7 @@
 # This pipeline needs the following tasks from Tekton Hub
 #   - git-clone
 #   - flake8
+#   - buildah (ClusterTask)
 #
 ---
 apiVersion: tekton.dev/v1beta1
@@ -16,6 +17,7 @@ spec:
     - name: repo-url
     - name: branch
       default: main
+    - name: build-image
 
   tasks:
     # --------------------------------------------------
@@ -29,7 +31,7 @@ spec:
           workspace: pipeline-workspace
 
     # --------------------------------------------------
-    # Clone repo
+    # Clone repository
     # --------------------------------------------------
     - name: clone
       taskRef:
@@ -82,3 +84,20 @@ spec:
           value: sqlite:///test.db
         - name: args
           value: "-v --with-spec --spec-color"
+
+    # --------------------------------------------------
+    # Build image (buildah)
+    # --------------------------------------------------
+    - name: build
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      runAfter:
+        - lint
+        - tests
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      params:
+        - name: IMAGE
+          value: $(params.build-image)
