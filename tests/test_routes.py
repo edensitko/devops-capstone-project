@@ -25,6 +25,8 @@ HTTPS_ENVIRON = {"wsgi.url_scheme": "https"}
 ######################################################################
 #  A C C O U N T   S E R V I C E   T E S T S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -51,6 +53,7 @@ class TestAccountService(TestCase):
     ##################################################################
     #  H E L P E R   M E T H O D S
     ##################################################################
+
     def _create_accounts(self, count):
         """Factory method to create accounts"""
         accounts = []
@@ -74,6 +77,7 @@ class TestAccountService(TestCase):
     ##################################################################
     #  R O U T E   T E S T S
     ##################################################################
+
     def test_index(self):
         """It should get 200_OK from the Home Page"""
         response = self.client.get("/")
@@ -140,6 +144,8 @@ class TestAccountService(TestCase):
 ######################################################################
 #  S E C U R I T Y   H E A D E R   T E S T S
 ######################################################################
+
+
 class TestSecurityHeaders(TestCase):
     """Test for security headers and CORS"""
 
