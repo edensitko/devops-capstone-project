@@ -18,6 +18,9 @@ spec:
       default: main
 
   tasks:
+    # --------------------------------------------------
+    # Init / cleanup
+    # --------------------------------------------------
     - name: init
       taskRef:
         name: cleanup
@@ -25,6 +28,9 @@ spec:
         - name: source
           workspace: pipeline-workspace
 
+    # --------------------------------------------------
+    # Clone repo
+    # --------------------------------------------------
     - name: clone
       taskRef:
         name: git-clone
@@ -39,6 +45,9 @@ spec:
         - name: revision
           value: $(params.branch)
 
+    # --------------------------------------------------
+    # Lint (flake8)
+    # --------------------------------------------------
     - name: lint
       taskRef:
         name: flake8
@@ -56,3 +65,20 @@ spec:
             - --max-complexity=10
             - --max-line-length=127
             - --statistics
+
+    # --------------------------------------------------
+    # Tests (nose)
+    # --------------------------------------------------
+    - name: tests
+      taskRef:
+        name: nose
+      runAfter:
+        - clone
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      params:
+        - name: database_uri
+          value: sqlite:///test.db
+        - name: args
+          value: "-v --with-spec --spec-color"
