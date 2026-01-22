@@ -11,6 +11,8 @@ from service import app
 ######################################################################
 # Health Endpoint
 ######################################################################
+
+
 @app.route("/health")
 def health():
     """Health Status"""
@@ -84,6 +86,8 @@ def get_account(account_id):
 ######################################################################
 # UPDATE AN ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts/<int:account_id>", methods=["PUT"])
 def update_account(account_id):
     """Update an existing Account"""
@@ -114,6 +118,8 @@ def update_account(account_id):
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id):
     """Delete an Account"""
